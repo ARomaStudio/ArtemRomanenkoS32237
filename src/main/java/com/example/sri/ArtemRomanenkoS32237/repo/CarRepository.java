@@ -1,6 +1,8 @@
 package com.example.sri.ArtemRomanenkoS32237.repo;
 
 import com.example.sri.ArtemRomanenkoS32237.model.Car;
+import org.hibernate.annotations.Parameter;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

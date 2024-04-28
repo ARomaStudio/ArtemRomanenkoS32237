@@ -1,5 +1,6 @@
 package com.example.sri.ArtemRomanenkoS32237.service;
 
+import com.example.sri.ArtemRomanenkoS32237.config.exceptions.ResourceNotFoundException;
 import com.example.sri.ArtemRomanenkoS32237.model.Car;
 import com.example.sri.ArtemRomanenkoS32237.repo.CarRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CarService {
 
+    private static final String RESOURCE_NOT_FOUND_MESSAGE_TEMPLATE = "Car resource with id: %s, not found in database";
+
     private final CarRepository carRepository;
 
     public List<Car> getAll() {
@@ -22,23 +25,30 @@ public class CarService {
         return carRepository.save(car);
     }
 
-    public Optional<Car> update(Long id, Car car) {
+    public void update(Long id, Car car) {
         Optional<Car> carFromDb = carRepository.findById(id);
-        if (carFromDb.isPresent()) {
-            car.setId(id);
-            carRepository.save(car);
+        if (carFromDb.isEmpty()) {
+            throw new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE_TEMPLATE.formatted(id));
         }
-        return carFromDb;
+        car.setId(id);
+        carRepository.save(car);
     }
 
-    public Optional<Car> getById(Long id) {
-        return carRepository.findById(id);
+    public Car getById(Long id) {
+        Optional<Car> carFromDb = carRepository.findById(id);
+        if (carFromDb.isEmpty()) {
+            throw new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE_TEMPLATE.formatted(id));
+        }
+        return carFromDb.get();
     }
 
-    public boolean deleteById(Long id) {
+    public void deleteById(Long id) {
         boolean exists = carRepository.existsById(id);
-        if (exists) carRepository.deleteById(id);
-        return exists;
+        if (exists) {
+            carRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException(RESOURCE_NOT_FOUND_MESSAGE_TEMPLATE.formatted(id));
+        }
     }
 
 }
